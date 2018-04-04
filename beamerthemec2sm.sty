@@ -12,7 +12,7 @@
 \newlength{\mylength}
 
 \mode<presentation>
-
+\definecolor{C2SM}{RGB}{87,171,223}
 \definecolor{ETH1}{RGB}{31,64,122}
 \definecolor{ETH3}{RGB}{0,105,180}
 \definecolor{ETH6}{RGB}{111,111,110}
@@ -24,13 +24,13 @@
 %It seems many of the following entries do not control any visible Behaviour. All such entries are
 %set to red, so that they are easy to spot if they ever become visible
 
-\setbeamercolor{headline}{fg=red,bg=ETH3} % This is the recommended color for Specialist community usage: change to ETH1 for general communication
-\setbeamercolor{footline}{fg=red, bg=red}
+\setbeamercolor{headline}{fg=red,bg=C2SM} % This is the recommended color for Specialist community usage: change to ETH1 for general communication
+\setbeamercolor{footline}{fg=red,bg=C2SM}
 \setbeamerfont{footline}{size=\large,series=\bf}
 \setbeamercolor{separation line}{bg=ETH3}
-\setbeamercolor{title in headline}{fg=white}
-\setbeamercolor{author in headline}{fg=white}
-\setbeamercolor{institute in headline}{fg=white}
+\setbeamercolor{title in headline}{fg=black}
+\setbeamercolor{author in headline}{fg=black}
+\setbeamercolor{institute in headline}{fg=black}
 
 \setbeamercolor{framesubtitle}{fg=red, bg=ta2gray}
 \setbeamercolor{author in head/foot}{fg=white, bg=ETH3}
@@ -38,7 +38,7 @@
 
 \setbeamercolor*{normal text}{fg=ETH6, bg=tlg}
 \setbeamercolor*{block body}{fg=black, bg=white}
-\setbeamercolor*{block title}{fg=black,bg=ETH10}
+\setbeamercolor*{block title}{fg=white,bg=ETH1}
 \setbeamerfont{block title}{size=\large,series=\bf}
 \setbeamercolor{upper separation line head}{fg=red}
 
@@ -89,15 +89,18 @@
 		\begin{columns}[c]
 			\begin{column}{.09\paperwidth}
 			\end{column}
-			\begin{column}{.675\paperwidth}
+			\begin{column}{.575\paperwidth}
 				\raggedleft
 				\usebeamercolor{title in headline}{\color{fg}\textbf{\LARGE{\inserttitle}}\\[1ex]}
 				\usebeamercolor{author in headline}{\color{fg}\large{\insertauthor}\\[1ex]}
 				\usebeamercolor{institute in headline}{\color{fg}\small{\insertinstitute}\\[1ex]}
 			\end{column}
-			\begin{column}{.25\paperwidth}
+			\begin{column}{.35\paperwidth}
 				\begin{center}
-					\includegraphics[width=.8\textwidth, height=.39\textwidth, keepaspectratio]{resources/pdflogo_black}
+          \includegraphics[width=.3\textwidth, keepaspectratio]{resources/pdflogo_black}
+          \includegraphics[width=.3\textwidth, keepaspectratio]{resources/logo_cscs}
+          \includegraphics[width=.3\textwidth, keepaspectratio]{resources/logo_mch}\\
+          \includegraphics[width=.8\textwidth, height=.7\textwidth, keepaspectratio]{resources/claw_logo_full_black}
 				\end{center}
 			\end{column}
 			\begin{column}{.03\paperwidth}
