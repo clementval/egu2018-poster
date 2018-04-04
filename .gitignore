@@ -7,3 +7,6 @@
 *.toc
 *.bbl
 *.blg
+*.dpth
+*.md5
+*.auxlock
