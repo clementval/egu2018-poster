@@ -1,14 +1,18 @@
 \documentclass{beamer}
 \usepackage[orientation=portrait,size=a0,scale=1.4,debug]{beamerposter}
 \mode<presentation>{\usetheme{c2sm}}
-\usepackage{chemformula}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{siunitx} %pretty measurement unit rendering
 \usepackage{hyperref} %enable hyperlink for urls
 \usepackage{ragged2e}
+\usepackage{pgfplots}
 \usepackage[font=scriptsize,justification=justified]{caption}
 \usepackage{array,booktabs,tabularx}
+
+\usepgfplotslibrary{external}
+\tikzexternalize
+\pgfplotsset{compat=1.5}
 
 \newcolumntype{Z}{>{\centering\arraybackslash}X} % centered tabularx columns
 \sisetup{per=frac,fraction=sfrac}
@@ -16,11 +20,27 @@
 \title{\huge Performance portability on GPU and CPU with the ICON global climate model}
 \author{Valentin Clement$^{1}$, Philippe Marti$^{1}$, Oliver Fuhrer$^{2}$, William Sawyer$^{3}$}
 \institute[ETH]{
-$^{1}$ETH Zurich, Center for Climate Systems Modeling C2SM, Zurich, Switerzland \\
+$^{1}$ETH Zurich, Center for Climate Systems Modeling (C2SM), Zurich, Switerzland \\
 $^{2}$Federal Office of Meteorology and Climatology MeteoSwiss, Zurich, Switzerland \\
 $^{3}$CSCS Swiss National Supercomputing Centre, Lugano, Switzerland
 }
 \date{\today}
+
+\definecolor{darkgreen}{rgb}{0,0.4,0}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{Gray}{rgb}{0,0,0}
+\definecolor{LightGray}{gray}{0.9}
+\definecolor{orange}{HTML}{C15900}
+\definecolor{color1}{HTML}{FFFFCC}
+\definecolor{color2}{HTML}{A1DAB4}
+\definecolor{color3}{HTML}{41B6C4}
+\definecolor{color4}{HTML}{225EA8}
+\definecolor{bblack}{HTML}{000000}
+
+\tikzstyle{process} = [rectangle, rounded corners, minimum width=12cm, minimum height=2.5cm,text centered, draw=black, fill=color2]
+\tikzstyle{tmp} = [rectangle, minimum width=12cm, minimum height=2.5cm, text centered, draw=black, fill=color3]
+\tikzstyle{fortran} = [rectangle, minimum width=12cm, minimum height=2.5cm, text centered, draw=black, fill=LightGray]
+\tikzstyle{arrow} = [thick,->,>=stealth]
 
 % edit this depending on how tall your header is. We should make this scaling automatic :-/
 \newlength{\columnheight}
@@ -71,30 +91,52 @@ source code.
 % Block 2
 %
 \begin{myblock}{Performance protability}
-% Selective Serotonin Reuptake Inhibitors (SSRI) are used in the treatment of depression, and have differing acute (e.g. stimulant and anxiogenic) and chronic (antidepressant and anxiolytic) effects - with the neuronal mechanism of the latter still being widely debated.
-% Possible explanations include the down-regulation of either the serotonin transporter protein (SERT), and/or serotonergic autoreceptors (5-HT$_1$A).
-% We are administering fluoxetine both chronically and acutely to a number of animals prepared for opto-fMRI; we present the timetable of the first cohort in figure~\ref{fig:tt}.
-% \vspace{0.5em}
-% \begin{figure}
-% 	\begin{minipage}{0.94\textwidth}
-% 		\centering\includegraphics[width=0.9\textwidth]{img/dm.png}
-% 		\caption{Band-pass filtered pulse-train-resolved first-level design model, with pulse trains represented in cyan.}
-% 		\label{fig:stim}
-% 	\end{minipage}
-% \end{figure}
-% \begin{itemize}
-% 	\item Opto-fMRI can be used to analyze chronic SSRI effects on serotonergic neurotransmission - by modelling the effect of treatment on individual pulse trains, or the interaction effect of treatment and pulse train number on series of pulse trains (as seen in figure~\ref{fig:stim}).
-%  	\item The large-scale readout capacity of opto-fMRI can also detect whether there are regionally varying effects of chronic SSRI administration (and consequently allow a functional characterization of neuronal subpopulations of the dorsal raphe).
-% \end{itemize}
-% \vspace{0.5em}
-% \begin{figure}
-% 	\begin{minipage}{0.94\textwidth}
-% 		\centering\includegraphics[width=0.9\textwidth]{img/tt.png}
-% 		\caption{Animal cohort treatment and measurement timetable. Opto-fMRI scan dates are tinted turquoise. Treatment-free days are shaded light gray, chronic (i.p.) fluoxetine administration days medium gray, and acute (i.v.) fluoxetine administration days dark gray.}
-% 		\label{fig:tt}
-% 	\end{minipage}
-% \end{figure}
+As mentioned before, restructuring the code to achieve better performance on
+one architecture can impact negatively the performance on another one.
+
+\begin{figure}[ht]
+\begin{tikzpicture}
+  \tikzstyle{every node}=[font=\small]
+  \begin{axis}[
+    height = 17cm,
+    major x tick style = transparent,
+    ybar=2*\pgflinewidth,
+    bar width=36pt,
+    ymajorgrids = true,
+    ylabel = {Execution time [s]},
+    symbolic x coords={Executed on CPU, Executed on GPU},
+    xtick = data,
+    scaled y ticks = false,
+    enlarge x limits=0.25,
+    ymin=0,
+    legend cell align=left,
+    legend style={
+      at={(1,1)},
+      anchor=north east,
+      column sep=1ex
+    }
+    ]
+    \addplot[style={bblack,fill=color2,mark=none}]
+      coordinates {(Executed on CPU, 0.8863) (Executed on GPU, 0.51135)};
+
+    \addplot[style={bblack,fill=color4,mark=none}]
+      coordinates {(Executed on CPU, 1.12311) (Executed on GPU, 0.33642)};
+
+    \legend{CPU optimized loop structure, GPU optimized loop structure}
+  \end{axis}
+\end{tikzpicture}
+\caption[Performance Portability comparison]{Performance Portability comparison}
+\label{fig:perfportability}
+\end{figure}
+
+Figure \ref{fig:perfportability} shows the kind of performance impact one can
+expect on typical physical parameterization code.
+
 \end{myblock}\vfill
+
+\begin{myblock}{CLAW Single Column Abstraction}
+\end{myblock}\vfill
+
 }\end{minipage}\end{beamercolorbox}
 \end{column}
 
@@ -110,7 +152,39 @@ source code.
 % Block 3
 %
 \begin{myblock}{CLAW Compiler}
-  \cite{XcodeML17}
+\cite{XcodeML17}
+
+  \begin{figure}
+
+  \begin{tikzpicture}[node distance=3.0cm]
+  \node (inf90) [fortran] {original.f90};
+  \node (fpp) [process, below of=inf90] {FPP};
+  \node (inf90fpp) [tmp, below of=fpp] {original.pp.f90};
+  \node (ffront) [process, below of=inf90fpp] {OMNI F-Front};
+  \node (xcodemlin) [tmp, below of=ffront] {XcodeML/F IR input};
+
+  \node (clawx2t) [process, right of=fpp, xshift=12cm] {CLAW X2T};
+  \node (xcodemlout) [tmp, below of=clawx2t] {XcodeML/F IR output};
+  \node (fback) [process, below of=xcodemlout] {OMNI F-Back};
+  \node (transformed) [fortran, below of=fback] {transformed.f90};
+
+  \draw [arrow] (inf90) -- (fpp);
+  \draw [arrow] (fpp) -- (inf90fpp);
+  \draw [arrow] (inf90fpp) -- (ffront);
+  \draw [arrow] (ffront) -- (xcodemlin);
+  \draw [arrow] (xcodemlin.east) -| ++(+0.5cm,+3cm) |- (clawx2t.west);
+  \draw [arrow] (clawx2t) -- (xcodemlout);
+  \draw [arrow] (xcodemlout) -- (fback);
+  \draw [arrow] (fback) -- (transformed);
+  \end{tikzpicture}
+
+      \caption[CLAW Compiler workflow]{CLAW Compiler workflow - the Fortran source file is pre-processed (FPP) and then completely parsed (OMNI F-Front) to a high-level intermediate representation (XcodeML IR). This representation is manipulated (CLAW X2T) and decompiled (OMNI F-Back) to pure Fortran code with compiler directives.
+  }
+  \label{fig:clawfc}
+\end{figure}
+
+
+
 % Optogenetic stimulation requires a number of preliminary procedures, including the breeding of genetically modified mice, the targeted infusion of a light-gated protein (ChR2) expressing viral vector, and the targeted implant of a durable optic fiber ferrule.
 % \vspace{0.2em}
 % \begin{figure}
@@ -163,6 +237,98 @@ source code.
 % Block 4
 %
 \begin{myblock}{Current results}
+
+  \begin{figure}[ht]
+  \begin{tikzpicture}
+      \tikzstyle{every node}=[font=\small]
+      \begin{axis}[
+          width = 0.45*\textwidth,
+          major x tick style = transparent,
+          ybar=2*\pgflinewidth,
+          bar width=30pt,
+          ymajorgrids = true,
+          ytick = {0,1,2,3,4,5,6,7,8},
+          ylabel = {Speedup},
+          symbolic x coords={GNU v7.1, Cray CCE v8.6.2, PGI v17.10},
+          xtick = data,
+          scaled y ticks = true,
+          enlarge x limits=0.25,
+          ymin=0,
+          legend cell align=left,
+          legend style={
+                  at={(1,1.02)},
+                  anchor=south east,
+                  column sep=1ex
+          }
+      ]
+          \addplot[style={bblack,fill=white,mark=none}]
+              coordinates {(GNU v7.1, 0.56) (Cray CCE v8.6.2, 1.0) (PGI v17.10, 0.89)};
+
+          \addplot[style={bblack,fill=color2,mark=none}]
+               coordinates {(GNU v7.1,0.18) (Cray CCE v8.6.2, 0.22) (PGI v17.10, 0.20)};
+
+          \addplot[style={bblack,fill=color3,mark=none}]
+               coordinates {(GNU v7.1, 5.6) (Cray CCE v8.6.2, 7.7) (PGI v17.10, 6.5)};
+
+          \addplot[style={bblack,fill=color4,mark=none}]
+               coordinates {(GNU v7.1, 1.25) (Cray CCE v8.6.2, 1.6) (PGI v17.10, 1.3)};
+
+
+          \legend{Original code (1core) (ref.), CLAW DSL (1core), CLAW - OpenMP (12cores), CLAW - OpenMP (GPU optimized code) (12cores)}
+      \end{axis}
+  \end{tikzpicture}%
+  % \caption[Performance comparison RRTMGP RTE SW solver on CPU]{Performance comparison
+  % RRTMGP RTE SW solver on CPU - Comparison of performance between the original version, a naive OpenMP version,
+  % the CLAW DSL version and two different CLAW - OpenMP generated versions. They are all executed on Intel Xeon E5-2690 v3
+  % Haswell CPU. Domain size (ncol, nlay) = 16384$\times$42 and 14 spectral bands. Original code
+  % compiled with Cray CCE v8.6.2 and executed on 1 core is taken as reference as it is the fastest one.}
+  % \label{fig:perf_sw1}
+  %\end{figure}%
+  ~%
+  %\begin{figure}[ht]%
+  \begin{tikzpicture}%
+    \tikzstyle{every node}=[font=\small]
+    \begin{axis}[
+      width = 0.45*\textwidth,
+      major x tick style = transparent,
+      ybar=2*\pgflinewidth,
+      bar width=36pt,
+      ymajorgrids = true,
+      ylabel = {Speedup},
+      ytick = {0,1,2,3,4,5,6,7,8,9,10,11,12},
+      symbolic x coords={Cray CCE v8.6.2, PGI v17.10},
+      xtick = data,
+      scaled y ticks = false,
+      enlarge x limits=0.25,
+      ymin=0,
+      legend cell align=left,
+      legend style={
+        at={(1,1)},
+        anchor=north east,
+        column sep=1ex
+        }
+      ]
+
+      \addplot[style={bblack,fill=color2,mark=none}]
+               coordinates { (Cray CCE v8.6.2, 1.0) (PGI v17.10, 0.8) };
+
+      \addplot[style={bblack,fill=color3,mark=none}]
+               coordinates { (Cray CCE v8.6.2, 11.9) (PGI v17.10, 9.6) };
+
+      \addplot[style={bblack,fill=color4,mark=none}]
+               coordinates { (Cray CCE v8.6.2, 11.7) (PGI v17.10, 9.7) };
+
+      \legend{CLAW - OpenMP (ref.), CLAW - OpenACC, OpenACC}
+    \end{axis}
+  \end{tikzpicture}
+  % \caption[Performance comparison RRTMGP RTE SW solver on GPU]{Performance comparison RRTMGP RTE
+  % SW solver on GPU - Speedup for CLAW - OpenACC generated version for GPU target and hand-written
+  % OpenACC version on NVIDIA P100. Domain size (ncol, nlay) = 16384$\times$42 and 14 spectral bands.
+  % Fastest CLAW - OpenMP results on 12 cores is taken as reference, i.e.
+  % obtained with Cray CCE v8.6.2 from Figure \ref{fig:perf_sw1}}
+  % \label{fig:perf_sw2}
+  \end{figure}
+
 % Preliminary results from the comparison of the first two measurement sessions (as seen in figure~\ref{fig:tt}) indicate that the uncorrected response to optogenetic stimulation across all trains (depicted individually in figure~\ref{fig:stim}) is stronger and more widespread immediately after acute fluoxetine administration than in the drug-naive mouse.
 % It is important to note that the results seen in figure~\ref{fig:fail} need further statistical ellaboration.
 % \begin{figure}
