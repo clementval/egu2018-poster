@@ -92,6 +92,12 @@ $^{3}$CSCS Swiss National Supercomputing Centre, Lugano, Switzerland
 \end{lstlisting}
 }
 
+\defverbatim\clawb{%
+\begin{lstlisting}
+$ clawfc --target=gpu --directive=openacc -o transformed.f90 original.f90
+\end{lstlisting}
+}
+
 \begin{frame}
 \begin{columns}
 \begin{column}{.43\textwidth}
@@ -114,7 +120,7 @@ without imposing disturbing changes to the code base, the CLAW Single Column
 Abstraction (SCA) is introduced. It is designed to address the physical
 parametrizations of atmospheric models which are horizontally independent so
 each column can be computed separately. With this approach, the physical
-parametrization is written in Fortran only considering the vertical
+parametrizations are written in Fortran only considering the vertical
 dependencies. The CLAW Compiler can transform the code for a specific
 target architecture and insert compiler directives such as OpenMP or OpenACC.
 \end{myblock}\vfill
@@ -124,8 +130,8 @@ target architecture and insert compiler directives such as OpenMP or OpenACC.
 %
 \begin{myblock}{Performance protability}
 Restructuring the code to achieve better performance on a specific architecture
-can a negative impact on another one. This can be shown between an x86 and a
-GPU architecture.
+can have a negative impact on another one. This can be shown between an x86 and
+a GPU architecture.
 
 \begin{figure}[ht]
 \begin{tikzpicture}
@@ -158,7 +164,7 @@ GPU architecture.
     \legend{CPU optimized loop structure, GPU optimized loop structure}
   \end{axis}
 \end{tikzpicture}
-\caption[Performance Portability comparison]{Performance Portability comparison}
+\caption[Performance portability problem]{Performance portability problem}
 \label{fig:perfportability}
 \end{figure}
 
@@ -178,17 +184,16 @@ on different target architectures with a single source code.
 The horizontal dimensions can be completely abstracted as they do not impose
 any data dependency in their iteration space.
 This information gives the flexibility to the CLAW Compiler to introduce
-back these dimensions at compile time where it is beneficial depending on the
+back these dimensions at compile-time where it is beneficial depending on the
 target architecture.
-
-A code restructured for CLAW SCA has the following properties:
+A code restructured to fit CLAW SCA has the following properties:
 \begin{itemize}
   \item Arrays containing horizontal dimensions are demoted.
   \item DO statements over the horizontal dimensions are removed.
   \item The subroutine to be transformed is encapsulated in a module to take
         advantage of cross-file transformation.
   \item The code is annotated with the CLAW SCA directive to drive the CLAW
-        Compiler. The directive is shown below.
+        Compiler. The directive syntax is described below.
 \end{itemize}
 
 \clawa
@@ -212,12 +217,12 @@ A code restructured for CLAW SCA has the following properties:
 \begin{myblock}{CLAW Compiler}
 The CLAW Compiler is:
 \begin{itemize}
-  \item An \textbf{open-source} source-to-source compiler.
+  \item An \textbf{open-source} source-to-source compiler for Fortran 2008 code.
   \item Able to understand the CLAW SCA directives and produce \textbf{optimized
         code} for specific target architecture and compiler directives.
   \item Based on the \textbf{OMNI Compiler Project}\cite{Omni} developed at
         RIKEN RCCS in Kobe, Japan.
-  \item Easily extensible to new architectures.
+  \item Modulare and easily extensible to new architectures.
 \end{itemize}
 
 \begin{figure}
@@ -246,11 +251,12 @@ The CLAW Compiler is:
   \label{fig:clawfc}
 \end{figure}
 
-Fortran code is preprocessed and then parsed to the XcodeML/F IR. This IR
-represented as an AST is then manipulated
-to produce the different version of the code for a specific target. Finally, the
-IR is decompiled to standard Fortran code before being compiled by default
-compilers.
+Fortran code is preprocessed and then parsed to the XcodeML/F\cite{XcodeML17}
+IR. This IR represented as an AST is then manipulated to produce the different
+version of the code for a specific target. Finally, the IR is decompiled to
+standard Fortran code before being compiled by default compilers.
+
+\clawb
 
 \raisebox{-.4\height}{\includegraphics[height=3cm, keepaspectratio]{resources/github}} https://github.com/claw-project
 
@@ -260,15 +266,15 @@ compilers.
 % Block 4
 %
 \begin{myblock}{Current results}
-To demonstrate the CLAW SCA approach and the use of the CLAW Compiler in a real
-life example, we applied it to the short-wave solver of the RRTMGP radiation
-code.
+To demonstrate the CLAW SCA approach and the use of the CLAW Compiler in a
+typical physical parameterization, we applied it to the short-wave solver of
+the RRTMGP radiation code.
 
 \begin{figure}[ht]
   \begin{tikzpicture}
     \tikzstyle{every node}=[font=\small]
     \begin{axis}[
-      title = {A) x86 parallel target vs. seq},
+      title = {A) Haswell parallel target vs. Haswell seq target},
       title style={at={(0.5,-0.15)},anchor=north,yshift=0.5},
       width = 0.45*\textwidth,
       major x tick style = transparent,
@@ -298,7 +304,7 @@ code.
     \addplot[style={bblack,fill=color4,mark=none}]
       coordinates {(GNU v7.1, 1.25) (Cray CCE v8.6.2, 1.6) (PGI v17.10, 1.3)};
 
-    \legend{Original code (1core) (ref.), CLAW SCA (1core), CLAW - OpenMP (12cores), CLAW - OpenMP (GPU optimized code) (12cores)}
+    \legend{Original code (1core) (ref.), CLAW SCA (1core), CLAW/CPU - OpenMP (12cores), CLAW/CPU - OpenMP (GPU loop) (12cores)}
 
     \end{axis}
   \end{tikzpicture}%
@@ -306,7 +312,7 @@ code.
   \begin{tikzpicture}%
     \tikzstyle{every node}=[font=\small]
     \begin{axis}[
-      title = {B) GPU target vs. parallel x86},
+      title = {B) Haswell target (ref.) vs. NVIDIA P100 target},
       title style={at={(0.5,-0.15)},anchor=north,yshift=0.5},
       width = 0.45*\textwidth,
       major x tick style = transparent,
@@ -337,25 +343,25 @@ code.
       \addplot[style={bblack,fill=color4,mark=none}]
                coordinates { (Cray CCE v8.6.2, 11.7) (PGI v17.10, 9.7) };
 
-      \legend{CLAW - OpenMP (ref.), CLAW - OpenACC, OpenACC}
+      \legend{CLAW/CPU - OpenMP (ref.), CLAW/GPU - OpenACC, OpenACC}
     \end{axis}
   \end{tikzpicture}
-  \caption[Performance comparison RRTMGP RTE SW solver on GPU]{Performance comparison RRTMGP RTE
-  SW solver on GPU - Speedup for CLAW - OpenACC generated version for GPU target and hand-written
-  OpenACC version on NVIDIA P100. Domain size (ncol, nlay) = 16384$\times$42 and 14 spectral bands.
-  Fastest CLAW - OpenMP results on 12 cores is taken as reference, i.e.
-  obtained with Cray CCE v8.6.2}
+  \caption[Performance comparison RRTMGP SW solver]{Performance comparison
+  (sokcet to socket) RRTMGP SW solver executed on Intel Haswell E5-2690v3 and
+  NVIDIA P100. Domain size (ncol, nlay) = 16384$\times$42 and 14 spectral bands.
+  }
   \label{fig:perf_sw}
 \end{figure}
 
 \begin{itemize}
   \item \textbf{8x} speedup achieved with the \textbf{CLAW CPU/OpenMP} version
-        compared to the fastest sequential version. This ratio can be up to
+        compared to the fastest sequential version. This ratio can reach up to
         \textbf{11x} when versions are compared with their respective compiler.
   \item \textbf{12x} speedup is achieved using the \textbf{CLAW GPU/OpenACC}
         version in comparison to the fastest OpenMP from
         Figure \ref{fig:perf_sw}A.
-  \item \textbf{85\%} of original code stays unchanged.
+  \item \textbf{85\%} of original code stays unchanged. Versions are
+        \textbf{automatically generated}.
   \item The CLAW SCA version is \textbf{Standard Fortran} code.
 \end{itemize}
 
