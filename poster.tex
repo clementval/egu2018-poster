@@ -23,7 +23,7 @@
 \title{\huge Performance portability on GPU and CPU with the ICON global climate model}
 \author{Valentin Clement$^{1}$, Philippe Marti$^{1}$, Oliver Fuhrer$^{2}$, William Sawyer$^{3}$}
 \institute[ETH]{
-$^{1}$ETH Zurich, Center for Climate Systems Modeling (C2SM), Zurich, Switerzland \\
+$^{1}$ETH Zurich, Center for Climate Systems Modeling (C2SM), Zurich, Switzerland \\
 $^{2}$Federal Office of Meteorology and Climatology MeteoSwiss, Zurich, Switzerland \\
 $^{3}$CSCS Swiss National Supercomputing Centre, Lugano, Switzerland
 }
@@ -112,15 +112,15 @@ $ clawfc --target=gpu --directive=openacc -o transformed.f90 original.f90
 In order to prepare for new supercomputer architectures, the global climate
 model ICON is being ported to GPU. The major part of the porting is achieved
 using OpenACC~\cite{Lapillonne2014} compiler directives. For time-critical
-components such as physical parametrizations, code restructuring and
+components such as physical parameterizations, code restructuring and
 optimizations are necessary to obtain optimal performance. In some cases,
 these GPU-optimizations may have a negative impact when running the same code
 on a CPU architecture. In order to address such performance portability issues
 without imposing disturbing changes to the code base, the CLAW Single Column
 Abstraction (SCA) is introduced. It is designed to address the physical
-parametrizations of atmospheric models which are horizontally independent so
+parameterizations of atmospheric models which are horizontally independent so
 each column can be computed separately. With this approach, the physical
-parametrizations are written in Fortran only considering the vertical
+parameterizations are written in Fortran only considering the vertical
 dependencies. The CLAW Compiler can transform the code for a specific
 target architecture and insert compiler directives such as OpenMP or OpenACC.
 \end{myblock}\vfill
@@ -222,7 +222,7 @@ The CLAW Compiler is:
         code} for specific target architecture and compiler directives.
   \item Based on the \textbf{OMNI Compiler Project}\cite{Omni} developed at
         RIKEN RCCS in Kobe, Japan.
-  \item Modulare and easily extensible to new architectures.
+  \item Modular and easily extensible to new architectures.
 \end{itemize}
 
 \begin{figure}
