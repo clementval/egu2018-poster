@@ -213,11 +213,11 @@ A code restructured for CLAW SCA has the following properties:
 The CLAW Compiler is:
 \begin{itemize}
   \item An \textbf{open-source} source-to-source compiler.
-  \item Able to understand the CLAW SCA directives and produce \textbf{optimzed
+  \item Able to understand the CLAW SCA directives and produce \textbf{optimized
         code} for specific target architecture and compiler directives.
   \item Based on the \textbf{OMNI Compiler Project}\cite{Omni} developed at
         RIKEN RCCS in Kobe, Japan.
-  \item Easily extensible to new architecture.
+  \item Easily extensible to new architectures.
 \end{itemize}
 
 \begin{figure}
@@ -247,9 +247,9 @@ The CLAW Compiler is:
 \end{figure}
 
 Fortran code is preprocessed and then parsed to the XcodeML/F IR. This IR
-resprensented as an AST is then manipulated
+represented as an AST is then manipulated
 to produce the different version of the code for a specific target. Finally, the
-IR is decompiled to standard Fortran code before being compiled by vendor
+IR is decompiled to standard Fortran code before being compiled by default
 compilers.
 
 \raisebox{-.4\height}{\includegraphics[height=3cm, keepaspectratio]{resources/github}} https://github.com/claw-project
